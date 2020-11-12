@@ -12,7 +12,7 @@ class IntTextField extends JTextField {
     }
 
     protected Document createDefaultModel() {
-        return (Document) new IntTextDocument();
+        return new IntTextDocument();
     }
 
 //    public boolean isValid() {
@@ -45,6 +45,7 @@ class IntTextField extends JTextField {
                 Integer.parseInt(newString + "0");
                 super.insertString(offs, str, a);
             } catch (NumberFormatException e) {
+                assert true;
             }
         }
     }

@@ -1,12 +1,14 @@
 package guessnumber;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.Locale;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -23,7 +25,7 @@ public class GuessNumber extends JFrame {
     private JPanel firstPanel, secondPanel;
     private IntTextField txfMin, txfMax, txfAttempt;
     private JButton btnOk;
-    private JTextArea txaResult;
+    private JTextPane txpResult;
     private JScrollPane scroll;
 
     public GuessNumber() {
@@ -34,10 +36,18 @@ public class GuessNumber extends JFrame {
         //locale = new Locale("en");
         locale = Locale.getDefault();
         bundle = ResourceBundle.getBundle("guessnumber.strings", locale);
+        String classpathStr = System.getProperty("java.class.path");
+        System.out.println(classpathStr);
+
+        URL imgURL = this.getClass().getResource("myappicon.png");
+        System.out.println(imgURL);
+        ImageIcon myAppIcon =  new ImageIcon(imgURL);
+        setIconImage(myAppIcon.getImage());
 
         setTitle(bundle.getString("window_title"));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(350, 450);
+        setLocationRelativeTo(null); // this method display the JFrame to center position of a screen
 
         pane = getContentPane();
         pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
@@ -58,11 +68,10 @@ public class GuessNumber extends JFrame {
         secondPanel.add(btnOk);
         pane.add(secondPanel);
 
-        txaResult = new JTextArea();
-        scroll = new JScrollPane (txaResult);
+        txpResult = new JTextPane();
+        scroll = new JScrollPane (txpResult);
         scroll.setMinimumSize(new Dimension(250, 350));
         scroll.setPreferredSize(new Dimension(250, 350));
-        //txaResult.setMaximumSize(new Dimension(250, 350));
         pane.add(scroll);
 
         class MyActionListener implements ActionListener {
@@ -70,13 +79,13 @@ public class GuessNumber extends JFrame {
                 Object source = e.getSource();
                 if (source.equals(btnOk)) {
                     int attempt = txfAttempt.getValue();
-                    txaResult.append(String.format("%d\t", attempt));
+                    appendToPane(txpResult, String.format("%d\t", attempt), Color.BLACK);
                     if (attempt < secret) {
-                        txaResult.append(bundle.getString("too_low_message") + '\n');
+                        appendToPane(txpResult,bundle.getString("too_low_message") + "\n", Color.BLUE);
                     } else if (attempt > secret) {
-                        txaResult.append(bundle.getString("too_high_message") + '\n');
+                        appendToPane(txpResult, bundle.getString("too_high_message") + "\n", Color.ORANGE);
                     } else {
-                        txaResult.append(bundle.getString("guessed_message") + "\n\n");
+                        appendToPane(txpResult, bundle.getString("guessed_message") + "\n\n", Color.GREEN);
                         // TODO: ask for new game
                         secret = generateRandomNumber(txfMin.getValue(), txfMax.getValue());
                     }
@@ -104,10 +113,23 @@ public class GuessNumber extends JFrame {
         int spread = max - min;
         if(spread < 0) spread = 0;
         int r = new Random().nextInt(spread + 1) + min;
-        txaResult.append(bundle.getString("new_number") + '\n');
+        appendToPane(txpResult, bundle.getString("new_number") + '\n', Color.MAGENTA);
         return r;
     }
 
+    private void appendToPane(JTextPane tp, String msg, Color c)
+    {
+        StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
+
+        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
+        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+
+        int len = tp.getDocument().getLength();
+        tp.setCaretPosition(len);
+        tp.setCharacterAttributes(aset, false);
+        tp.replaceSelection(msg);
+    }
     public static void main(String[] args) {
         GuessNumber ex = new GuessNumber();
         ex.setVisible(true);
