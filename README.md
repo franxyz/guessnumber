@@ -1,4 +1,4 @@
 # guessnumber
 Guess the number:
-simply game writte in Java an Swing framework to experiment useful techiques.
+simple game written in Java using Swing framework to experiment useful techiques.
 
