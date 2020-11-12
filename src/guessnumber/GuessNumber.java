@@ -15,8 +15,6 @@ import java.util.ResourceBundle;
 
 public class GuessNumber extends JFrame {
 
-    //private final int MIN_NUMBER = 0;
-    //private final int MAX_NUMBER = 100;
     private int secret;
 
     private Locale locale;
