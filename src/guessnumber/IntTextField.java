@@ -45,6 +45,7 @@ class IntTextField extends JTextField {
                 Integer.parseInt(newString + "0");
                 super.insertString(offs, str, a);
             } catch (NumberFormatException e) {
+                // do nothing
                 assert true;
             }
         }
